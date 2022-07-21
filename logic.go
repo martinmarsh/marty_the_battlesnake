@@ -42,23 +42,10 @@ func end(state GameState) {
 // This function is called on every turn of a game. Use the provided GameState to decide
 // where to move -- valid moves are "up", "down", "left", or "right".
 // We've provided some code and comments to get you started.
-func move(state GameState) BattlesnakeMoveResponse {
+func move(state GameState, plan BoardPlan) BattlesnakeMoveResponse {
 
 
-	possibleMoves := GetAllowedMoves(state)
-
-  
-
-
-  
-	// TODO: Step 1 - Don't hit walls.
-	// Use information in GameState to prevent your Battlesnake from moving beyond the boundaries of the board.
-	// boardWidth := state.Board.Width
-	// boardHeight := state.Board.Height
-
-	// TODO: Step 2 - Don't hit yourself.
-	// Use information in GameState to prevent your Battlesnake from colliding with itself.
-	// mybody := state.You.Body
+	possibleMoves := GetAllowedMoves(state, plan)
 
 	// TODO: Step 3 - Don't collide with others.
 	// Use information in GameState to prevent your Battlesnake from colliding with others.

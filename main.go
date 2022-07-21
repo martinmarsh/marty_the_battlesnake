@@ -91,6 +91,14 @@ type BattlesnakeMoveResponse struct {
 	Shout string `json:"shout,omitempty"`
 }
 
+// State struct
+
+type BoardPlan struct {
+  Width int
+	Height int
+  Elements [][] int
+}
+
 // HTTP Handlers
 
 func HandleIndex(w http.ResponseWriter, r *http.Request) {
@@ -118,13 +126,38 @@ func HandleStart(w http.ResponseWriter, r *http.Request) {
 
 func HandleMove(w http.ResponseWriter, r *http.Request) {
 	state := GameState{}
+  plan := BoardPlan{}
 	err := json.NewDecoder(r.Body).Decode(&state)
 	if err != nil {
 		log.Printf("ERROR: Failed to decode move json, %s", err)
 		return
 	}
+  plan.Width = state.Board.Width
+  plan.Height = state.Board.Height
 
-	response := move(state)
+  plan.Elements = make([][]int, plan.Width)
+    for i := 0; i < plan.Width; i++ {
+        plan.Elements[i] = make([]int, plan.Height)
+    }
+
+  // Add body of snake to plan
+  mybody := state.You.Body
+  for _, b := range mybody {
+    plan.Elements[b.X][b.Y] = 21
+  }
+
+  snakes := state.Board.Snakes
+  for _,snake := range snakes{
+    for _, b := range snake.Body {
+      plan.Elements[b.X][b.Y] = 31
+    }
+  }
+  // Add body of other snakes to plan
+  
+
+  log.Print(plan.Elements)  
+  
+	response := move(state, plan)
 
 	w.Header().Set("Content-Type", "application/json")
 	err = json.NewEncoder(w).Encode(response)
