@@ -20,7 +20,7 @@ func  not_dead_end(x, y int, plan *BoardPlan) bool{
   xp := 0
   yu := 0
   //width up and down
-  for ys:= 1; ; y++{
+  for ys:= 0; ys < plan.Height - 1; ys++{
     width := 1
     up_right := true
     up_left := true
@@ -35,6 +35,7 @@ func  not_dead_end(x, y int, plan *BoardPlan) bool{
         up_right = false
       }
       yu = y-ys
+      //log.Printf("38: x %d, y %d", xp, yu)
       if yu >=0 && xp < plan.Width - 1 && plan.Elements[xp][yu] <= 20 && down_right {
         width++
       } else {
@@ -64,7 +65,7 @@ func  not_dead_end(x, y int, plan *BoardPlan) bool{
     } 
   }
   //height left and right
-  for xs:= 1; ; y++{
+  for xs:= 1; xs < plan.Height - 1; xs++{
     height := 1
     left_up := true
     left_down := true
