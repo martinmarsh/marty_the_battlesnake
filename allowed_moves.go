@@ -5,9 +5,27 @@ import (
 	
 )
 
+func Iabs(x int64) int64 {
+	if x < 0 {
+		return -x
+	} else if x == 0 {
+    return 1
+  }
+	return x
+}
 
-func GetAllowedMoves(state GameState, plan BoardPlan) map[string]bool {
+func food_wighting(x, y int, food []Coord) int {
+   weight := 0
+   for _, food_pos := range food {
+     weight += 1000000 / (Iabs(food_pos.X - x) + Iabs(food_pos.Y - y))
+   }
+   return weight
+}
 
+func GetBestMove(state GameState, plan BoardPlan) string {
+
+  var nextMove string
+  
 	possibleMoves := map[string]bool{
 		"up":    true,
 		"down":  true,
@@ -16,11 +34,8 @@ func GetAllowedMoves(state GameState, plan BoardPlan) map[string]bool {
 	}
   // Don't let your Battlesnake move back in on it's own neck
   // Don't move out of board
-  //myBody := state.You.Body
+  
   myHead := state.You.Body[0]
-	//myNeck := state.You.Body[1] // Coordinates of body piece directly behind your head (your "neck")
-	
-
   // Can I move up?
   if  myHead.Y >= plan.Height - 1 || plan.Elements[myHead.X][myHead.Y + 1] > 20 {
     possibleMoves["up"] = false
@@ -40,7 +55,47 @@ func GetAllowedMoves(state GameState, plan BoardPlan) map[string]bool {
   if myHead.X >= plan.Width - 1 || plan.Elements[myHead.X + 1][myHead.Y] > 20 {
     possibleMoves["right"] = false
   }
-  
 
-  return possibleMoves
+  safeMoves := []string{}
+	for move, isSafe := range possibleMoves {
+		if isSafe {
+			safeMoves = append(safeMoves, move)
+		}
+	}
+
+
+  
+  if len(safeMoves) == 0 {
+		nextMove = "down"
+		log.Printf("%s MOVE %d: No safe moves detected! Moving %s\n", state.Game.ID, state.Turn, nextMove)
+	} else {
+    // Find move weighted towards food
+    weightings := make(map[string]int)
+    food := state.Board.Food
+    
+    for _, direction := range safeMoves:
+      switch direction {
+        case "up":
+           weightings[direction] = food_wighting(myHead.X, myHead.Y+1, food)
+        case "down":
+          weightings[direction] = food_wighting(myHead.X, myHead.Y-1, food)
+        case "left":
+          weightings[direction] = food_wighting(myHead.X-1, myHead.Y, food)
+        case "right":
+          weightings[direction] = food_wighting(myHead.X+1, myHead.Y, food) 
+    }
+    
+    highest := 0
+
+    for direction, weight := range weightings{
+      if weight > highest{
+         nextMove = direction
+         highest = weight
+      } else if weight == highest && rand.Intn(1) == 1{
+         nextMove = direction   
+      }
+        
+    }
+
+  return nextMove
 }

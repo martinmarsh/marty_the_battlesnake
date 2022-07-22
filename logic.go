@@ -41,36 +41,14 @@ func end(state GameState) {
 
 // This function is called on every turn of a game. Use the provided GameState to decide
 // where to move -- valid moves are "up", "down", "left", or "right".
-// We've provided some code and comments to get you started.
+
 func move(state GameState, plan BoardPlan) BattlesnakeMoveResponse {
 
+	nextMove := GetBestMove(state, plan)
 
-	possibleMoves := GetAllowedMoves(state, plan)
-
-	// TODO: Step 3 - Don't collide with others.
-	// Use information in GameState to prevent your Battlesnake from colliding with others.
-
-	// TODO: Step 4 - Find food.
-	// Use information in GameState to seek out and find food.
-
-	// Finally, choose a move from the available safe moves.
-	// TODO: Step 5 - Select a move to make based on strategy, rather than random.
-	var nextMove string
-
-	safeMoves := []string{}
-	for move, isSafe := range possibleMoves {
-		if isSafe {
-			safeMoves = append(safeMoves, move)
-		}
-	}
-
-	if len(safeMoves) == 0 {
-		nextMove = "down"
-		log.Printf("%s MOVE %d: No safe moves detected! Moving %s\n", state.Game.ID, state.Turn, nextMove)
-	} else {
-		nextMove = safeMoves[rand.Intn(len(safeMoves))]
-		log.Printf("%s MOVE %d: %s\n", state.Game.ID, state.Turn, nextMove)
-	}
+	
+	log.Printf("%s MOVE %d: %s\n", state.Game.ID, state.Turn, nextMove)
+	
 	return BattlesnakeMoveResponse{
 		Move: nextMove,
 	}

@@ -140,19 +140,21 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
         plan.Elements[i] = make([]int, plan.Height)
     }
 
-  // Add body of snake to plan
+  // Add body of my snake to plan
   mybody := state.You.Body
   for _, b := range mybody {
     plan.Elements[b.X][b.Y] = 21
   }
 
+   // Add body of other snakes to plan
   snakes := state.Board.Snakes
-  for _,snake := range snakes{
+  for i, snake := range snakes{
+    base_number := 30 + i
     for _, b := range snake.Body {
-      plan.Elements[b.X][b.Y] = 31
+      plan.Elements[b.X][b.Y] = base_number
     }
   }
-  // Add body of other snakes to plan
+ 
   
 
   log.Print(plan.Elements)  
