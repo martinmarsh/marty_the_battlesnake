@@ -7,7 +7,6 @@ package main
 
 import (
 	"log"
-	"math/rand"
 )
 
 // This function is called when you register your Battlesnake on play.battlesnake.com
@@ -20,7 +19,7 @@ func info() BattlesnakeInfoResponse {
 	return BattlesnakeInfoResponse{
 		APIVersion: "1",
 		Author:     "martinmarsh",  // Battlesnake username
-		Color:      "#888888", // TODO: Personalize
+		Color:      "#8888FF", // TODO: Personalize
 		Head:       "default", // TODO: Personalize
 		Tail:       "default", // TODO: Personalize
 	}
@@ -42,7 +41,7 @@ func end(state GameState) {
 // This function is called on every turn of a game. Use the provided GameState to decide
 // where to move -- valid moves are "up", "down", "left", or "right".
 
-func move(state GameState, plan BoardPlan) BattlesnakeMoveResponse {
+func move(state *GameState, plan *BoardPlan) BattlesnakeMoveResponse {
 
 	nextMove := GetBestMove(state, plan)
 

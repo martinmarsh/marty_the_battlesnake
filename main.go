@@ -149,17 +149,20 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
    // Add body of other snakes to plan
   snakes := state.Board.Snakes
   for i, snake := range snakes{
-    base_number := 30 + i
+    base_number := 40 + i
     for _, b := range snake.Body {
       plan.Elements[b.X][b.Y] = base_number
     }
   }
- 
-  
+  // Add hazards to plan
+  hazards := state.Board.Hazards
+  for _, b := range hazards {
+    plan.Elements[b.X][b.Y] = 31
+  }
 
-  log.Print(plan.Elements)  
+  //log.Print(plan.Elements)  
   
-	response := move(state, plan)
+	response := move(&state, &plan)
 
 	w.Header().Set("Content-Type", "application/json")
 	err = json.NewEncoder(w).Encode(response)
