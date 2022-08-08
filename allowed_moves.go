@@ -15,7 +15,7 @@ func Iabs(x int) int {
 }
 
 func is_on_board(x, y int, plan *BoardPlan) bool {
-	if y >= plan.Height-1 || y <= 0 || x >= plan.Width-1 || x <= 0 {
+	if y >= plan.Height || y < 0 || x >= plan.Width || x < 0 {
 		return false
 	}
 	return true
@@ -28,7 +28,7 @@ func passage_width(x, y, direction_x, direction_y int, plan *BoardPlan) int {
 		for scan := 1; scan < 10; scan++ {
 			xs := x + scan*direction_x*direction
 			ys := y + scan*direction_y*direction
-			if is_on_board(xs, ys, plan) &&  plan.Elements[xs][ys] < 31 {
+			if is_on_board(xs, ys, plan) &&  plan.Elements[xs][ys] < 32 {
 				width++
 			} else {
 				break
@@ -42,21 +42,21 @@ func move_along_passage(x, y, direction_x, direction_y int, plan *BoardPlan) (in
 	width := 0
 	max_width := 1
 	min_width := 10000
-	scan := 1
+	scan := 0
 	for {
 		xs := x + scan*direction_x
 		ys := y + scan*direction_y
 		// width direction is at right angles
-		direction_width_y := 0
-		direction_width_x := 1
-		if direction_width_x == 0 {
-			direction_width_y = 1
-			direction_width_x = 0
+		direction_width_y := 1
+		direction_width_x := 0
+		if direction_x == 0 {
+			direction_width_y = 0
+			direction_width_x = 1
 		}
 
 		if is_on_board(xs, ys, plan) && plan.Elements[xs][ys] < 32 {
 			width = passage_width(xs, ys, direction_width_x, direction_width_y, plan)
-			if max_width > width {
+			if max_width < width {
 				max_width = width
 			}
 			if min_width > width {
@@ -74,7 +74,7 @@ func not_dead_end(x, y, direction_x, direction_y int, plan *BoardPlan) bool {
   max_width, min_width, length := move_along_passage(x, y, direction_x, direction_y, plan)
   log.Printf("Space for x:%d, y:%d, d: %d %d, %d %d %d/n", x, y, direction_x, direction_y, max_width, min_width, length)
   
-  if min_width < 2 && length < 10 {
+  if max_width < 2 && length < 7 {
     return false
   } 
 
