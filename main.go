@@ -126,41 +126,41 @@ func HandleStart(w http.ResponseWriter, r *http.Request) {
 
 func HandleMove(w http.ResponseWriter, r *http.Request) {
 	state := GameState{}
-  plan := BoardPlan{}
+	plan := BoardPlan{}
 	err := json.NewDecoder(r.Body).Decode(&state)
 	if err != nil {
 		log.Printf("ERROR: Failed to decode move json, %s", err)
 		return
 	}
-  plan.Width = state.Board.Width
-  plan.Height = state.Board.Height
+  	plan.Width = state.Board.Width
+  	plan.Height = state.Board.Height
 
-  plan.Elements = make([][]int, plan.Width)
+  	plan.Elements = make([][]int, plan.Width)
     for i := 0; i < plan.Width; i++ {
         plan.Elements[i] = make([]int, plan.Height)
     }
 
-  // Add body of my snake to plan
-  mybody := state.You.Body
-  for _, b := range mybody {
-    plan.Elements[b.X][b.Y] = 21
-  }
+  	// Add body of my snake to plan
+ 	 mybody := state.You.Body
+  	for _, b := range mybody {
+    	plan.Elements[b.X][b.Y] = 31
+  	}
 
-   // Add body of other snakes to plan
-  snakes := state.Board.Snakes
-  for i, snake := range snakes{
-    base_number := 40 + i
-    for _, b := range snake.Body {
-      plan.Elements[b.X][b.Y] = base_number
-    }
-  }
-  // Add hazards to plan
-  hazards := state.Board.Hazards
-  for _, b := range hazards {
-    plan.Elements[b.X][b.Y] = 31
-  }
+   	// Add body of other snakes to plan
+  	snakes := state.Board.Snakes
+  	for i, snake := range snakes{
+    	base_number := 40 + i
+    	for _, b := range snake.Body {
+      	plan.Elements[b.X][b.Y] = base_number
+    	}
+  	}
+  	// Add hazards to plan
+  	hazards := state.Board.Hazards
+  	for _, b := range hazards {
+    	plan.Elements[b.X][b.Y] = 21
+ 	 }
 
-  //log.Print(plan.Elements)  
+  	//log.Print(plan.Elements)  
   
 	response := move(&state, &plan)
 
