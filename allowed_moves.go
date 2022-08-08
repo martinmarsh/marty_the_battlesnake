@@ -22,7 +22,7 @@ func is_on_board(x, y int, plan *BoardPlan) bool {
 }
 
 func passage_width(x, y, direction_x, direction_y int, plan *BoardPlan) int {
-	width := 0
+	width := 1
 	measure := []int{-1, 1}
 	for _, direction := range measure {
 		for scan := 1; scan < 10; scan++ {
@@ -38,8 +38,9 @@ func passage_width(x, y, direction_x, direction_y int, plan *BoardPlan) int {
 	return width
 }
 
-func move_along_passage(x, y, direction_x, direction_y int, plan *BoardPlan) (int, int, int) {
+func move_along_passage(x, y, direction_x, direction_y int, plan *BoardPlan) (int, int, int, int) {
 	width := 0
+  volume := 0
 	max_width := 1
 	min_width := 10000
 	scan := 0
@@ -56,7 +57,8 @@ func move_along_passage(x, y, direction_x, direction_y int, plan *BoardPlan) (in
 
 		if is_on_board(xs, ys, plan) && plan.Elements[xs][ys] < 32 {
 			width = passage_width(xs, ys, direction_width_x, direction_width_y, plan)
-			if max_width < width {
+			volume += width
+      if max_width < width {
 				max_width = width
 			}
 			if min_width > width {
@@ -67,16 +69,20 @@ func move_along_passage(x, y, direction_x, direction_y int, plan *BoardPlan) (in
 			break
 		}
 	}
-	return max_width, min_width, scan
+	return max_width, min_width, scan, volume
 }
 
-func not_dead_end(x, y, direction_x, direction_y int, plan *BoardPlan) bool {
-  max_width, min_width, length := move_along_passage(x, y, direction_x, direction_y, plan)
-  log.Printf("Space for x:%d, y:%d, d: %d %d, %d %d %d/n", x, y, direction_x, direction_y, max_width, min_width, length)
+func not_dead_end(x, y, direction_x, direction_y int, plan *BoardPlan, state *GameState) bool {
+  max_width, min_width, length, volume := move_along_passage(x, y, direction_x, direction_y, plan)
+  log.Printf("Space for x:%d, y:%d, d: %d %d, %d %d %d %d/n", x, y, direction_x, direction_y, max_width, min_width, length, volume)
   
-  if max_width < 2 && length < 7 {
+  if max_width < 2 && int(state.You.Length) {
     return false
-  } 
+  }
+
+  if volume < int(state.You.Length) + 1 {
+    return false
+  }
 
 	return true
 
@@ -113,28 +119,28 @@ func GetBestMove(state *GameState, plan *BoardPlan) string {
 	if myHead.Y >= plan.Height-1 || plan.Elements[myHead.X][myHead.Y+1] > 20 {
 		possibleMoves["up"] = false
 	} else {
-		possibleMoves["up"] = not_dead_end(myHead.X, myHead.Y+1, 0, 1, plan)
+		possibleMoves["up"] = not_dead_end(myHead.X, myHead.Y+1, 0, 1, plan, state)
 	}
 
 	// Can I move down?
 	if myHead.Y <= 0 || plan.Elements[myHead.X][myHead.Y-1] > 20 {
 		possibleMoves["down"] = false
 	} else {
-		possibleMoves["down"] = not_dead_end(myHead.X, myHead.Y-1, 0, -1, plan)
+		possibleMoves["down"] = not_dead_end(myHead.X, myHead.Y-1, 0, -1, plan, state)
 	}
 
 	// Can I move left?
 	if myHead.X <= 0 || plan.Elements[myHead.X-1][myHead.Y] > 20 {
 		possibleMoves["left"] = false
 	} else {
-		possibleMoves["left"] = not_dead_end(myHead.X-1, myHead.Y, -1, 0, plan)
+		possibleMoves["left"] = not_dead_end(myHead.X-1, myHead.Y, -1, 0, plan, state)
 	}
 
 	// Can I move Right?
 	if myHead.X >= plan.Width-1 || plan.Elements[myHead.X+1][myHead.Y] > 20 {
 		possibleMoves["right"] = false
 	} else {
-		possibleMoves["right"] = not_dead_end(myHead.X+1, myHead.Y, 1, 0, plan)
+		possibleMoves["right"] = not_dead_end(myHead.X+1, myHead.Y, 1, 0, plan, state)
 	}
 
 	// Avoid dead ends
