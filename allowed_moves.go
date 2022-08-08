@@ -28,7 +28,7 @@ func passage_width(x, y, direction_x, direction_y int, plan *BoardPlan) int {
 		for scan := 1; scan < 10; scan++ {
 			xs := x + scan*direction_x*direction
 			ys := y + scan*direction_y*direction
-			if is_on_board(xs, ys, plan) &&  plan.Elements[xs][ys] < 32 {
+			if is_on_board(xs, ys, plan) &&  plan.Elements[xs][ys] < 31 {
 				width++
 			} else {
 				break
@@ -41,7 +41,7 @@ func passage_width(x, y, direction_x, direction_y int, plan *BoardPlan) int {
 func move_along_passage(x, y, direction_x, direction_y int, plan *BoardPlan) (int, int, int) {
 	width := 0
 	max_width := 1
-	min_width := 1
+	min_width := 10000
 	scan := 1
 	for {
 		xs := x + scan*direction_x
@@ -59,7 +59,7 @@ func move_along_passage(x, y, direction_x, direction_y int, plan *BoardPlan) (in
 			if max_width > width {
 				max_width = width
 			}
-			if min_width < width {
+			if min_width > width {
 				min_width = width
 			}
 			scan++
@@ -71,7 +71,9 @@ func move_along_passage(x, y, direction_x, direction_y int, plan *BoardPlan) (in
 }
 
 func not_dead_end(x, y, direction_x, direction_y int, plan *BoardPlan) bool {
-	_, min_width, length := move_along_passage(x, y, direction_x, direction_y, plan)
+  max_width, min_width, length := move_along_passage(x, y, direction_x, direction_y, plan)
+  log.Printf("Space for x:%d, y:%d, d: %d %d, %d %d %d/n", x, y, direction_x, direction_y, max_width, min_width, length)
+  
   if min_width < 2 && length < 10 {
     return false
   } 
