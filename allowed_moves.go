@@ -76,7 +76,7 @@ func not_dead_end(x, y, direction_x, direction_y int, plan *BoardPlan, state *Ga
   max_width, min_width, length, volume := move_along_passage(x, y, direction_x, direction_y, plan)
   log.Printf("Space for x:%d, y:%d, d: %d %d, %d %d %d %d/n", x, y, direction_x, direction_y, max_width, min_width, length, volume)
   
-  if max_width < 2 && int(state.You.Length) {
+  if max_width < 2 && length > int(state.You.Length) {
     return false
   }
 
